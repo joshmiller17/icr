@@ -2,6 +2,9 @@ import csv
 from statsmodels.stats import inter_rater
 import matplotlib.pyplot as plt
 import numpy as np
+import krippendorff
+import pandas
+import sys
 
 LIST_OF_CODES = [""]
 with open("csg-codes.txt") as f:
@@ -190,32 +193,89 @@ def summary():
         print(c + ":" + str(percent_agreement(code = c, debug = False, summary = True)))
 
 
+
+def k_alpha():
+    # each row is a coder
+    # each column is a cell*code, e.g. cell 6 (row 2, col 1) - access
+    # each cell entry is a binary of whether coder put code for that cell
+
+    # for simplicity, let's just hard-code the values we need
+    COLS_PER_ROW = 5
+    ret = {"c1":[], "c2":[], "c3":[]}
+    
+    
+    for row_num, row_dict in codes.items():
+        # row_dict = coder : codes by col, e.g. [ ["NA"] , ["DESIGN", "TUT"], ... ]
+        for col in range(COLS_PER_ROW):
+            cell_num = row_num * COLS_PER_ROW
+            for code in LIST_OF_CODES:
+                if code == "" or code == "NA":
+                    continue
+                for coder, values in row_dict.items():
+                    code_exists = 1 if code in values[col] else 0
+                    ret[coder].append(code_exists)
+    
+    # all data in ret
+    # we're already hardcoding >.>
+    df = []
+    df.append(ret["c1"])
+    df.append(ret["c2"])
+    df.append(ret["c3"])
+
+    pan_df = pandas.DataFrame(df)
+    pan_df = pan_df.loc[:, (pan_df != 0).any(axis=0)] # drop columns that are all 0s
+    
+    # back to np
+    np_df = pan_df.to_numpy()
+    
+    
+    # test print
+    # np.set_printoptions(threshold=sys.maxsize)
+    # print(np_df)
+    
+    ka = krippendorff.alpha(reliability_data=np_df)
+    print("")
+    print("Krippendorff: ", ka)
+
+
+def confusion_matrix():
+    print("Confusion matrix")
+    code_length = 3
+    with open('confusion_matrix.txt', 'w') as f:
+        matrix = confusion_matrix()
+        matrix[len(matrix)-1][0] = 0 # TODO remove when we get to the end of coding
+        matrix[0][len(matrix)-1] = 0 # TODO remove when we get to the end of coding
+        f.write('\t')
+        for r in range(len(matrix)):
+            f.write(LIST_OF_CODES[r][:code_length] + '\t')
+        f.write('\n')
+        for r in range(len(matrix)):
+            f.write(LIST_OF_CODES[r][:code_length] + '\t')
+            for cell in matrix[r]:
+                f.write(str(cell))
+                f.write('\t')
+            f.write('\n')
+        plt.imshow(matrix, cmap='plasma')
+        plt.xticks(range(len(matrix)), LIST_OF_CODES, rotation=75)
+        plt.yticks(range(len(matrix)), LIST_OF_CODES)
+        plt.show()
+
 #unit_test()
+
+print("Reading data")
 read_codes('C1-v3.tsv', 'c1')
 read_codes('C2-v3.tsv', 'c2')
 read_codes('C3-v3.tsv', 'c3')
-check_valid_data(codes)
 
-code_length = 3
-with open('confusion_matrix.txt', 'w') as f:
-    matrix = confusion_matrix()
-    matrix[len(matrix)-1][0] = 0 # TODO remove when we get to the end of coding
-    matrix[0][len(matrix)-1] = 0 # TODO remove when we get to the end of coding
-    f.write('\t')
-    for r in range(len(matrix)):
-        f.write(LIST_OF_CODES[r][:code_length] + '\t')
-    f.write('\n')
-    for r in range(len(matrix)):
-        f.write(LIST_OF_CODES[r][:code_length] + '\t')
-        for cell in matrix[r]:
-            f.write(str(cell))
-            f.write('\t')
-        f.write('\n')
-    plt.imshow(matrix, cmap='plasma')
-    plt.xticks(range(len(matrix)), LIST_OF_CODES, rotation=75)
-    plt.yticks(range(len(matrix)), LIST_OF_CODES)
-    plt.show()
+#print("Checking valid")
+#check_valid_data(codes)
+
+#confusion_matrix()
+
 
 #print("Fleiss' Kappa: ", str(fleiss_kappa(debug = True)))
 
-summary() # percent agreements
+print("K Alpha")
+k_alpha()
+
+#summary() # percent agreements
