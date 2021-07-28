@@ -209,7 +209,7 @@ def k_alpha():
         for col in range(COLS_PER_ROW):
             cell_num = row_num * COLS_PER_ROW
             for code in LIST_OF_CODES:
-                if code == "" or code == "NA":
+                if code == "" or code == "NA": # basically the same
                     continue
                 for coder, values in row_dict.items():
                     code_exists = 1 if code in values[col] else 0
@@ -238,7 +238,7 @@ def k_alpha():
     print("Krippendorff: ", ka)
 
 
-def confusion_matrix():
+def do_confusion_matrix():
     print("Confusion matrix")
     code_length = 3
     with open('confusion_matrix.txt', 'w') as f:
@@ -263,14 +263,14 @@ def confusion_matrix():
 #unit_test()
 
 print("Reading data")
-read_codes('C1-v3.tsv', 'c1')
-read_codes('C2-v3.tsv', 'c2')
-read_codes('C3-v3.tsv', 'c3')
+read_codes('c1.tsv', 'c1')
+read_codes('c2.tsv', 'c2')
+read_codes('c3.tsv', 'c3')
 
-#print("Checking valid")
-#check_valid_data(codes)
+print("Checking valid")
+check_valid_data(codes)
 
-#confusion_matrix()
+do_confusion_matrix()
 
 
 #print("Fleiss' Kappa: ", str(fleiss_kappa(debug = True)))
@@ -278,4 +278,4 @@ read_codes('C3-v3.tsv', 'c3')
 print("K Alpha")
 k_alpha()
 
-#summary() # percent agreements
+summary() # percent agreements
