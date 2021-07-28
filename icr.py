@@ -209,10 +209,19 @@ def k_alpha():
 		for col in range(COLS_PER_ROW):
 			cell_num = row_num * COLS_PER_ROW
 			for code in LIST_OF_CODES:
-				if code == "" or code == "NA": # basically the same
-					continue
+				# if code == "" or code == "NA": # basically the same
+					# continue
 				for coder, values in row_dict.items():
-					code_exists = 1 if code in values[col] else 0
+					# substitutions
+					v = []
+					for i in values:
+						if i == "EDUCATIONAL": # same
+							v.append("USOG")
+						elif i == "NA": # same
+							v.append("")
+						else:
+							v.append(i)
+					code_exists = 1 if code in v[col] else 0
 					ret[coder].append(code_exists)
 	
 	# all data in ret
