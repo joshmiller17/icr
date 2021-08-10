@@ -97,6 +97,8 @@ def confusion_matrix():
 		num_coders = len(row)
 		num_cols = len(row[0])
 		
+		confusions_this_row = 0
+		
 		for c in range(num_cols):
 			
 			all_codes_this_cell = []
@@ -108,10 +110,14 @@ def confusion_matrix():
 					#if i >= j:
 					if i == j:
 						if count_data(all_codes_this_cell, code = LIST_OF_CODES[i]) >= 2:
-							matrix[i][j] += 1
+							#matrix[i][j] += 1
+							pass # test
 					else:
-						if LIST_OF_CODES[i] in all_codes_this_cell and LIST_OF_CODES[j] in all_codes_this_cell:
+						if LIST_OF_CODES[i] in all_codes_this_cell and LIST_OF_CODES[j] in all_codes_this_cell and not count_data(all_codes_this_cell, code = LIST_OF_CODES[i]) >= 2  and not count_data(all_codes_this_cell, code = LIST_OF_CODES[j]) >= 2:
 							matrix[i][j] += 1
+							confusions_this_row += 1
+		if confusions_this_row > 25:
+			print("row", (int(row_num)+1), "is confusing:", confusions_this_row)
 								
 	return matrix
 
@@ -215,12 +221,13 @@ def k_alpha():
 					# substitutions
 					v = []
 					for i in values:
-						if i == "EDUCATIONAL": # same
-							v.append("USOG")
-						elif i == "NA": # same
-							v.append("")
-						else:
-							v.append(i)
+						v.append(i)
+						#if i == "EDUCATIONAL": # same
+						#	v.append("USOG")
+						#elif i == "NA": # same
+						#	v.append("")
+						#else:
+						#	v.append(i)
 					code_exists = 1 if code in v[col] else 0
 					ret[coder].append(code_exists)
 	
