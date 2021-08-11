@@ -1,3 +1,8 @@
+# Project specific
+
+*.tsv
+confusion_matrix.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
