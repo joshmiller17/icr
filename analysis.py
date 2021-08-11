@@ -69,7 +69,7 @@ def dump_df_info(df_name, df, as_csv):
 
 grouped_by_game = combined_df.groupby("Game")
 
-# @JOSH LOOK AT THESE TWO LINES
+# @JOSH LOOK THESE LINES
 for name, df in grouped_by_game:
     if name != '':
         dump_df_info(name, df, False)
