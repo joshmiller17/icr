@@ -19,7 +19,7 @@ def clean_df(df_withna):
                              .replace('/', '')\
                              .upper()\
                              .split(',')
-            return list(filter(lambda list_item: list_item != "", split_item))
+            return list(filter(None, split_item))
         return series.map(clean_item)
 
     for ans_col in ANSWER_COLUMNS:
@@ -48,20 +48,52 @@ combined_df = combine_dfs(*coder_dfs)
 
 ## Analysis
 
-def dump_df_info(df_name, df):
-    def value_information(series): return pd.Series(reduce(ADD, series)).value_counts().drop("NA")
+def dump_df_info(df_name, df, as_csv):
+    def dump_series_info(series_name, series):
+        reduced_list         = list(filter(lambda code: code != "NA", reduce(ADD, series)))
+        num_codes            = len(reduced_list)
+        values               = pd.Series(reduced_list).value_counts()
+        value_df             = pd.DataFrame(values).rename({0: "Counts"}, axis=1)
+        value_df["Percents"] = value_df["Counts"] / num_codes * 100
+        print(f'{series_name}\n')
+        print(f'{value_df.to_csv() if as_csv else value_df}\n')
+        print(f'num codes: {num_codes}\n')
 
     print(f'== INFORMATION FOR {df_name.upper()} == \n')
+
     for ans_col in ANSWER_COLUMNS:
-        print(ans_col)
-        print(value_information(df[ans_col]))
-        print()
+        dump_series_info(ans_col, df[ans_col])
+
+    dump_series_info("All columns for this dataframe combined",
+                     pd.concat([df[ans_col] for ans_col in ANSWER_COLUMNS]))
 
 grouped_by_game = combined_df.groupby("Game")
 
-# @JOSH LOOK AT THESE TWO LINES
-dump_df_info("Foldit", grouped_by_game.get_group('Foldit'))
-# dump_df_info("all data", combined_df)
+## Output functions
 
-print("all games:")
-print(grouped_by_game.groups.keys())
+def dump_all():
+    dump_df_info("all data", combined_df, False)
+    dump_df_info("all data", combined_df, True)
+
+def dump_by_game():
+    for name, df in grouped_by_game:
+        if name != '':
+            dump_df_info(name, df, False)
+    for name, df in grouped_by_game:
+        if name != '':
+            dump_df_info(name, df, True)
+
+def dump_combined_except(*games_to_exclude):
+    filtered_df = combined_df[combined_df['Game'].map(lambda game: game not in games_to_exclude)]
+    dump_df_info(f"All data combined, except for games {games_to_exclude}", filtered_df, True)
+    dump_df_info(f"All data combined, except for games {games_to_exclude}", filtered_df, False)
+
+# @JOSH here you are
+dump_combined_except("Foldit")
+dump_combined_except("Foldit", "EteRNA", "EyeWire")
+
+# @JOSH if you want these as well
+# dump_all()
+# dump_by_game()
+
+print(f"Games List: {grouped_by_game.groups.keys()}")

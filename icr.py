@@ -286,6 +286,7 @@ read_codes('c2.tsv', 'c2')
 read_codes('c3.tsv', 'c3')
 
 print("Checking valid")
+
 check_valid_data(codes)
 
 do_confusion_matrix()
