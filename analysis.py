@@ -69,16 +69,31 @@ def dump_df_info(df_name, df, as_csv):
 
 grouped_by_game = combined_df.groupby("Game")
 
-# @JOSH LOOK THESE LINES
-for name, df in grouped_by_game:
-    if name != '':
-        dump_df_info(name, df, False)
+## Output functions
 
-dump_df_info("all data", combined_df, False)
+def dump_all():
+    dump_df_info("all data", combined_df, False)
+    dump_df_info("all data", combined_df, True)
 
+def dump_by_game():
+    for name, df in grouped_by_game:
+        if name != '':
+            dump_df_info(name, df, False)
+    for name, df in grouped_by_game:
+        if name != '':
+            dump_df_info(name, df, True)
 
-for name, df in grouped_by_game:
-    if name != '':
-        dump_df_info(name, df, True)
+def dump_combined_except(*games_to_exclude):
+    filtered_df = combined_df[combined_df['Game'].map(lambda game: game not in games_to_exclude)]
+    dump_df_info(f"All data combined, except for games {games_to_exclude}", filtered_df, True)
+    dump_df_info(f"All data combined, except for games {games_to_exclude}", filtered_df, False)
 
-dump_df_info("all data", combined_df, True)
+# @JOSH here you are
+dump_combined_except("Foldit")
+dump_combined_except("Foldit", "EteRNA", "EyeWire")
+
+# @JOSH if you want these as well
+# dump_all()
+# dump_by_game()
+
+print(f"Games List: {grouped_by_game.groups.keys()}")
