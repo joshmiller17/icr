@@ -11,8 +11,9 @@ def ADD(a, b): return a + b
 
 ## Reading
 
-def clean_df(df_withna):
-    df = df_withna.fillna("")
+def clean_df(df_withna_with_invalid):
+    df_with_invalid = df_withna_with_invalid.fillna("")
+    df = df_with_invalid[df_with_invalid['Valid'] == 'Yes']
     def clean_series(series):
         def clean_item(item):
             split_item = item.replace(' ', '')\
