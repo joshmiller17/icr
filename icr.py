@@ -10,7 +10,7 @@ LIST_OF_CODES = [""]
 with open("csg-codes.txt") as f:
 	for line in f.readlines():
 		LIST_OF_CODES.append(line.rstrip())
-data_columns = [2, 3, 5, 7, 8]
+data_columns = [3, 4, 6, 8, 9]
 codes = {} # {row num : {coder : codes}}
 
 def check_valid_data(data):
@@ -53,6 +53,8 @@ def read_codes(filename, coder):
 		next(reader) # skip header
 		row_count = 1
 		for row in reader:
+			if row[0] != "Yes":
+			    continue
 			data = []
 			for i in range(len(row)):
 				if i in data_columns:
@@ -67,6 +69,7 @@ def read_codes(filename, coder):
 				codes[str(row_count)] = {}
 			codes[str(row_count)][coder] = data
 			row_count += 1
+		print(row_count)
 		
 def count_data(data, code = None):
 	"""Helper function that counts the number of data points in an arbitrary list of lists"""
@@ -281,15 +284,15 @@ def do_confusion_matrix():
 #unit_test()
 
 print("Reading data")
-read_codes('c1.tsv', 'c1')
-read_codes('c2.tsv', 'c2')
-read_codes('c3.tsv', 'c3')
+read_codes('data/C1-v4.tsv', 'c1')
+read_codes('data/C2-v4.tsv', 'c2')
+read_codes('data/C3-v4.tsv', 'c3')
 
 print("Checking valid")
 
 check_valid_data(codes)
 
-do_confusion_matrix()
+# do_confusion_matrix()
 
 
 #print("Fleiss' Kappa: ", str(fleiss_kappa(debug = True)))
