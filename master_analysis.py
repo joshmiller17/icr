@@ -30,5 +30,16 @@ def splitstrip(string):
     return list(map(lambda s: s.strip(), string.split(",")))
 genres = df['What kind of games do you play? Check all that apply.'].fillna("").map(splitstrip)
 
+"""
+racing = action +1
+moba = strategy +2
+point and click = role playing +1
+chess = strategy
+minecraft = casual
+survival = role playing +1
+scrabble / cross/ word = casual +3
+neopets = casual +1
+"""
+
 crunched_genres = pd.Series(reduce(lambda x, y: x + y, genres))
 print(crunched_genres.value_counts())
